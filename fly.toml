@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for lavonaschaffer-github-io-crimson-wildflower-972-long-fog-7390-green-moon-6633-bold-fog-7399 on 2024-02-29T11:13:33+07:00
+# fly.toml app configuration file generated for water-quality-project-still-sea-4331 on 2024-02-29T17:10:52+07:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'lavonaschaffer-github-io-crimson-wildflower-972-long-fog-7390-green-moon-6633-bold-fog-7399'
+app = 'water-quality-project-still-sea-4331'
 primary_region = 'hkg'
 
 [build]

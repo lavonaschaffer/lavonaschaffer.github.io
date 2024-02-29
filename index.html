@@ -1,4 +1,26 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Map Website</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl1KFan0b8-CUfVZn1q87FDQNAT61fRKc&callback=initMap" async defer></script>
+  <script src="script.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="side-panel">
+    <h2>Charts</h2>
+    <div id="charts-container"></div>
+  </div>
+</body>
+</html>
+
+
+<!--
+<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -40,7 +62,7 @@
     <div id="chart-panel">
         <span class="close" onclick="closeChartPanel()"></span>
         <div class="charts-container" id="chartContainer">
-            <!-- Charts will be loaded here -->
+            Charts will be loaded here 
         </div>
     </div>
 
@@ -110,105 +132,95 @@
     </script>
 </body>
 </html>
+-->
 
 <!--
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Maps Markers</title>
     <style>
+        /* Set the size of your map */
         #map {
-            height: 500px;
+            height: 100vh;
             width: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .highlighted-marker {
+            background-color: #ff0;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <script>
-        var map;
-        var markers = [];
-        var data;
 
+        var infoWindow;
+
+        function createInfoWindow() {
+            if (!infoWindow) {
+                infoWindow = new google.maps.InfoWindow();
+        }
+    }
+
+    
+        var map;
+
+        function updateMarkerColor(marker, isUnderLimit) {
+            if (isUnderLimit) {
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+            } else {
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+            }
+        }
+
+        // Sample code to add markers to the map
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 20.98757293313669, lng: 105.93685697450815 },
                 zoom: 15
             });
 
-            // Fetch data from Google Sheets
-            fetch('https://sheets.googleapis.com/v4/spreadsheets/1-rQXU0t33ILZb3maYWHjexXdAcKLVph0ljoGLspnmzQ/values/Sheet1!A1:D?key=')
-                .then(response => response.json())
-                .then(data => {
-                    // Parse data and update markers
-                    updateMarkers(data.values);
-                });
-        }
+            // Create markers
+            var locations = [
+                { lat: 20.98757293313669, lng: 105.93685697450815 },
+                { lat: 20.9885281986878, lng: 105.93641384324708 },
+                { lat: 20.989660048349222, lng: 105.936062074998 },
+                { lat: 20.990689732556987, lng: 105.9356772327678 }
+            ];
 
-        function updateMarkers(values) {
-            // Remove existing markers
-            markers.forEach(marker => {
-                marker.setMap(null);
-            });
-            markers = [];
-
-            // Create new markers
-            for (var i = 0; i < values.length; i++) {
-                var location = { lat: parseFloat(values[i][0]), lng: parseFloat(values[i][1]) };
+            for (var i = 0; i < locations.length; i++) {
                 var marker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    icon: getMarkerIcon(i)
+                    position: locations[i],
+                    map: map
                 });
 
-                // Add event listeners
-                marker.addListener('dblclick', function () {
-                    handleMarkerDoubleClick(i);
-                });
-
-                markers.push(marker);
-            }
-        }
-
-        function getMarkerIcon(index) {
-            var color = (data[index][2] > data[index][3]) ? 'green' : 'yellow';
-            return {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 8,
-                fillColor: color,
-                fillOpacity: 0.6,
-                strokeColor: 'black',
-                strokeWeight: 1
-            };
-        }
-
-         // Create markers
-        var locations = [
-            { lat: 20.98757293313669, lng: 105.93685697450815 },
-            { lat: 20.9885281986878, lng: 105.93641384324708 },
-            { lat: 20.989660048349222, lng: 105.936062074998 },
-            { lat: 20.990689732556987, lng: 105.9356772327678 }
-        ];
-
-        for (var i = 0; i < locations.length; i++) {
-        var marker = new google.maps.Marker({
-            position: locations[i],
-            map: map
-        });
-
-        // Add click event listener
-        marker.addListener('click', function() {
-            var iframeContent = `<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/${this.getPosition().toString().split('(')[1].split(')')[0]}?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>`;
-            var infoWindow = new google.maps.InfoWindow();
-            infoWindow.setContent(iframeContent);
-            infoWindow.open(map, this);
+                // Add click event listener
+                marker.addListener('click', function() {
+                    var iframeContent = <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>;
+                                        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>;
+                                        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>;
+                                        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>;
+                    var infoWindow = new google.maps.InfoWindow();
+                    infoWindow.setContent(iframeContent);
+                    infoWindow.open(map, this);
         });
     }
+        }
+
     </script>
+
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl1KFan0b8-CUfVZn1q87FDQNAT61fRKc&callback=initMap">
     </script>
 </body>
 </html>
+
 -->
+
