@@ -1,44 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Maps Markers</title>
     <style>
         #map {
-            height: 400px;
-            width: 100%;
+            height: 100%;
         }
-        #side-panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 300px;
-            height: 400px;
-            background-color: white;
-            padding: 10px;
-            border: 1px solid #ccc;
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #chart-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 33%;
+            height: 100%;
+            background: #f0f0f0;
             display: none;
+            z-index: 999;
         }
-        #side-panel.active {
-            display: block;
+        .charts-container {
+            height: calc(100% - 40px); /* Adjust for close button height */
+            overflow-y: auto;
+            padding: 10px;
         }
-        iframe {
-            width: 100%;
-            height: 200px;
-            border: none;
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
-    <div id="side-panel">
-        <iframe id="chart1" src=""></iframe>
-        <iframe id="chart2" src=""></iframe>
-        <iframe id="chart3" src=""></iframe>
-        <iframe id="chart4" src=""></iframe>
+    <div id="chart-panel">
+        <span class="close" onclick="closeChartPanel()"></span>
+        <div class="charts-container" id="chartContainer">
+            <!-- Charts will be loaded here -->
+        </div>
     </div>
+
     <script>
-        var map;
-        var markers = [];
+        var map, infoWindow, chartPanel;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -46,47 +53,58 @@
                 zoom: 15
             });
 
+            // Create a single InfoWindow instance
+            infoWindow = new google.maps.InfoWindow();
+
+            // Create a single Chart Panel instance
+            chartPanel = new google.maps.InfoWindow({
+                maxWidth: 400
+            });
+
             // Create markers
             var locations = [
-                { lat: 20.98757293313669, lng: 105.93685697450815, status: true },
-                { lat: 20.9885281986878, lng: 105.93641384324708, status: false },
-                { lat: 20.989660048349222, lng: 105.936062074998, status: false },
-                { lat: 20.990689732556987, lng: 105.9356772327678, status: false }
+                { lat: 20.98757293313669, lng: 105.93685697450815 },
+                { lat: 20.9885281986878, lng: 105.93641384324708 },
+                { lat: 20.989660048349222, lng: 105.936062074998 },
+                { lat: 20.990689732556987, lng: 105.9356772327678 }
             ];
 
-            for (var i = 0; i < locations.length; i++) {
+            locations.forEach(function(location) {
                 var marker = new google.maps.Marker({
-                    position: locations[i],
-                    map: map,
-                    icon: locations[i].status ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+                    position: location,
+                    map: map
                 });
 
-                // Add click event listener
-                marker.addListener('click', function () {
-                    handleMarkerClick(locations.indexOf(this.getPosition().toJSON()));
+                marker.addListener('click', function() {
+                    openChartPanel(location);
                 });
-
-                markers.push(marker);
-            }
+            });
         }
 
-        function handleMarkerClick(chartIndex) {
-            var iframeSources = [
-                'https://thingspeak.com/channels/2449920/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line',
-                'https://thingspeak.com/channels/2449920/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15',
-                'https://thingspeak.com/channels/2449920/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15',
-                'https://thingspeak.com/channels/2449920/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15'
-                        ];
-                      
-                    document.getElementById('side-panel').className = 'active';
-                    document.getElementById('chart1').src = iframeSources[chartIndex - 1];
-                    document.getElementById('chart2').src = iframeSources[(chartIndex % 4) + 1];
-                    document.getElementById('chart3').src = iframeSources[(chartIndex % 4) + 2];
-                    document.getElementById('chart4').src = iframeSources[(chartIndex % 4) + 3];
-                    };
-                
-        
+        function openChartPanel(location) {
+            // Open the chart panel
+            chartPanel.setContent(document.getElementById('chart-panel'));
+            chartPanel.setPosition(location);
+            chartPanel.open(map);
+
+            // Load the chart iframes dynamically
+            var chartContainer = document.getElementById('chartContainer');
+            var iframeContent = `
+                <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line"></iframe>
+                <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+            `;
+            var chartPanel = new google.maps.chartPanel();
+            chartPanel.setContent(iframeContent);
+            chartPanel.open(map, this);
+        }
+
+        function closeChartPanel() {
+            chartPanel.close();
+        }
     </script>
+    
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl1KFan0b8-CUfVZn1q87FDQNAT61fRKc&callback=initMap">
     </script>

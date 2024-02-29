@@ -1,0 +1,36 @@
+/* Custom styles for the map, markers, and side panel */
+#map {
+  height: 100%;
+}
+
+/* Style for markers */
+.marker {
+  /* Add custom marker styles if needed */
+}
+
+/* Style for the side panel */
+#chart-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 33%; /* Adjust width as needed */
+  height: 100%;
+  background: #f0f0f0;
+  display: none;
+  z-index: 999;
+  overflow-y: auto; /* Allow scrolling if content exceeds panel height */
+}
+
+/* Style for the close button */
+.close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* Style for charts container */
+.charts-container {
+  padding: 10px;
+}
