@@ -1,50 +1,45 @@
-
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Google Maps Markers</title>
     <style>
-        /* Set the size of your map */
         #map {
-            height: 100vh;
+            height: 400px;
             width: 100%;
         }
-
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+        #side-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: none;
         }
-
-        .highlighted-marker {
-            background-color: #ff0;
+        #side-panel.active {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="side-panel">
+        <iframe id="chart1" src=""></iframe>
+        <iframe id="chart2" src=""></iframe>
+        <iframe id="chart3" src=""></iframe>
+        <iframe id="chart4" src=""></iframe>
+    </div>
     <script>
-
-        var infoWindow;
-
-        function createInfoWindow() {
-            if (!infoWindow) {
-                infoWindow = new google.maps.InfoWindow();
-        }
-    }
-
-    
         var map;
+        var markers = [];
 
-        function updateMarkerColor(marker, isUnderLimit) {
-            if (isUnderLimit) {
-                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
-            } else {
-                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
-            }
-        }
-
-        // Sample code to add markers to the map
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 20.98757293313669, lng: 105.93685697450815 },
@@ -53,28 +48,44 @@
 
             // Create markers
             var locations = [
-                { lat: 20.98757293313669, lng: 105.93685697450815 },
-                { lat: 20.9885281986878, lng: 105.93641384324708 },
-                { lat: 20.989660048349222, lng: 105.936062074998 },
-                { lat: 20.990689732556987, lng: 105.9356772327678 }
+                { lat: 20.98757293313669, lng: 105.93685697450815, status: true },
+                { lat: 20.9885281986878, lng: 105.93641384324708, status: false },
+                { lat: 20.989660048349222, lng: 105.936062074998, status: false },
+                { lat: 20.990689732556987, lng: 105.9356772327678, status: false }
             ];
 
             for (var i = 0; i < locations.length; i++) {
                 var marker = new google.maps.Marker({
                     position: locations[i],
-                    map: map
+                    map: map,
+                    icon: locations[i].status ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
                 });
 
                 // Add click event listener
-                marker.addListener('click', function() {
-                    var iframeContent = `<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2449920/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>`;
-                    var infoWindow = new google.maps.InfoWindow();
-                    infoWindow.setContent(iframeContent);
-                    infoWindow.open(map, this);
-        });
-    }
+                marker.addListener('click', function () {
+                    handleMarkerClick(locations.indexOf(this.getPosition().toJSON()));
+                });
+
+                markers.push(marker);
+            }
         }
 
+        function handleMarkerClick(chartIndex) {
+            var iframeSources = [
+                'https://thingspeak.com/channels/2449920/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line',
+                'https://thingspeak.com/channels/2449920/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15',
+                'https://thingspeak.com/channels/2449920/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15',
+                'https://thingspeak.com/channels/2449920/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15'
+                        ];
+                      
+                    document.getElementById('side-panel').className = 'active';
+                    document.getElementById('chart1').src = iframeSources[chartIndex - 1];
+                    document.getElementById('chart2').src = iframeSources[(chartIndex % 4) + 1];
+                    document.getElementById('chart3').src = iframeSources[(chartIndex % 4) + 2];
+                    document.getElementById('chart4').src = iframeSources[(chartIndex % 4) + 3];
+                    };
+                
+        
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl1KFan0b8-CUfVZn1q87FDQNAT61fRKc&callback=initMap">
