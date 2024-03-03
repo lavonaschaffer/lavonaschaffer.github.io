@@ -11,7 +11,7 @@
 /* Style for the side panel */
 #chart-panel {
   position: fixed;
-  top: 0;
+  top: 100;
   right: 0;
   width: 33%; /* Adjust width as needed */
   height: 100%;
@@ -33,4 +33,17 @@
 /* Style for charts container */
 .charts-container {
   padding: 10px;
+}
+body{
+position: relative;
+overflow-y: hidden;
+}
+#charts{
+  display: grid;
+  grid-template-columns: repeat(1fr ,4);
+  width: 30rem;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
